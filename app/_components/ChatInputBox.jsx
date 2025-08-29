@@ -59,13 +59,13 @@ export default function ChatInputBox() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                {AIModelsOption.map((model,index)=>(
-                    <DropdownMenuItem key={index}>
-                        <div className='mb-1'>
-                            <h2 className='text-sm'>{model.name}</h2>
-                            <p className='text-xs'>{model.desc}</p>
-                        </div>
-                    </DropdownMenuItem>
+                {AIModelsOption.map((model, index) => (
+                  <DropdownMenuItem key={index}>
+                    <div className="mb-1">
+                      <h2 className="text-sm">{model.name}</h2>
+                      <p className="text-xs">{model.desc}</p>
+                    </div>
+                  </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>

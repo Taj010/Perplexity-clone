@@ -14,6 +14,12 @@ import Image from "next/image";
 import { Compass, GalleryHorizontalEnd, LogIn, Search } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import {
+  SignUpButton,
+  UserButton,
+  useUser,
+  SignOutButton,
+} from "@clerk/nextjs";
 
 const MenuOptions = [
   {
@@ -31,15 +37,11 @@ const MenuOptions = [
     icon: GalleryHorizontalEnd,
     path: "/library",
   },
-  {
-    title: "Sign In",
-    icon: LogIn,
-    path: "#",
-  },
 ];
 
 function AppSidebar() {
   const path = usePathname();
+  const { user } = useUser();
   return (
     <Sidebar className="bg-accent">
       <SidebarHeader className="bg-accent flex items-center py-5">
@@ -63,21 +65,45 @@ function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              {/* Show Sign In/Sign Up option only when user is not logged in */}
+              {!user && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    className={`p-5 py-5 hover:bg-transparent hover:font-bold
+             ${path?.includes("/sign-in") && "font-bold"}`}
+                  >
+                    <a href="/sign-in" className="">
+                      <LogIn className="w-7 h-7" />
+                      <span className="text-lg">Sign In</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
             </SidebarMenu>
-            <Button className="rounded-full mx-4 mt-4"> Sign Up </Button>
+            {!user ? (
+              <SignUpButton mode="modal">
+                <Button className="rounded-full mx-4 mt-4"> Sign Up </Button>
+              </SignUpButton>
+            ) : (
+              <SignOutButton>
+                <Button className="rounded-full mx-4 mt-4"> Log Out </Button>
+              </SignOutButton>
+            )}
           </SidebarContent>
         </SidebarGroup>
         <SidebarGroup />
       </SidebarContent>
       <SidebarFooter className="bg-accent">
-        <div className="p-3">
+        <div className="p-3 flex flex-col">
           <h2 className="text-gray-500"> Try Now</h2>
           <p className="text-gray-400">
             Upgrate for image upload, smarter AI & more copilot
           </p>
-          <Button variant={"secondary"} className={"text-gray-500"}>
+          <Button variant={"secondary"} className={"text-gray-500 mb-3"}>
             ⇗Learn More
           </Button>
+          <UserButton />
         </div>
       </SidebarFooter>
     </Sidebar>
