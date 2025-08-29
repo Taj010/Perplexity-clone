@@ -1,4 +1,5 @@
-import React from "react";
+"use client"
+import React, { useState } from "react";
 import Image from "next/image";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -9,6 +10,7 @@ import {
   Paperclip,
   Mic,
   AudioLines,
+  ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,8 +22,30 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { AIModelsOption } from "@/services/Shared";
+import { useUser } from "@clerk/nextjs";
+import { supabase } from "@/services/supabase";
 
 export default function ChatInputBox() {
+  const [userSearchInput, setUserSearchInput] = useState();
+  const [searchType, setSearchType] = useState("Search");
+  const {user} = useUser()
+  const [loading, setLoading] = useState(false)
+
+
+  const onSearchQuery = async () => {
+    setLoading(true)
+    const result = await supabase.from('Library').insert([
+      {
+        searchInput: userSearchInput,
+        userEmail: user?.primaryEmailAddress.emailAddress,
+        type: searchType, 
+      }
+    ]).select()
+    // console.log(result)
+    setLoading(false)
+  }
+    
+
   return (
     <div className="flex flex-col items-center justify-center h-screen w-full">
       <Image src={"/logo.png"} alt="logo" width={260} height={250} />
@@ -32,6 +56,7 @@ export default function ChatInputBox() {
               <input
                 type="text"
                 placeholder="Ask anything..."
+                onChange={(e) => setUserSearchInput(e.target.value)}
                 className="w-full p-4 outline-none"
               />
             </TabsContent>
@@ -39,14 +64,15 @@ export default function ChatInputBox() {
               <input
                 type="text"
                 placeholder="Research anything..."
+                onChange={(e) => setUserSearchInput(e.target.value)}
                 className="w-full p-4 outline-none"
               />
             </TabsContent>
             <TabsList>
-              <TabsTrigger value="Search" className={"text-primary"}>
+              <TabsTrigger value="Search" className={"text-primary"} onClick={() => setSearchType("Search")}>
                 <SearchCheck /> Search
               </TabsTrigger>
-              <TabsTrigger value="Research" className={"text-primary"}>
+              <TabsTrigger value="Research" className={"text-primary"} onClick={() => setSearchType("Research")}>
                 <Atom /> Research
               </TabsTrigger>
             </TabsList>
@@ -78,8 +104,10 @@ export default function ChatInputBox() {
             <Button variant="ghost">
               <Mic className="text-gray-500 h-5 w-5" />
             </Button>
-            <Button>
-              <AudioLines className="text-white h-5 w-5" />
+            <Button onClick={() => {
+              userSearchInput?onSearchQuery():null
+            }}>
+              {!userSearchInput ? <AudioLines className="text-white h-5 w-5" /> : <ArrowRight className="text-white h-5 w-5" disabled={loading} />}
             </Button>
           </div>
         </div>
